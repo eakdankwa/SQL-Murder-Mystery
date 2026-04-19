@@ -2,18 +2,25 @@
 You vaguely remember that the crime was a ​murder​ that occurred sometime on ​Jan.15, 2018​ and that it took place in ​SQL City​. Start by retrieving
 the corresponding crime scene report from the police department’s database. */
 
-/* QUESTION 1: Write a query that identifies the first witness. */
+/* QUESTION 1: Write a query that identifies the first witness.
+QUESTION 2:Write a query that identifies the second witness. 
+QUESTION 3: Find the murderer!
+QUESTION 4: Find the real villain behind this crime.
+*/
 
---EXPLANATION: This particular query shows a glimse of the DATE, TYPE of crime & the DESCRIPTION of the crime
+
+-- RETRIEVE CRIME SCENE REPORT
 
 SELECT * 
 FROM crime_scene_report
 WHERE LOWER(city) LIKE 'sql%' 
 AND type LIKE 'murder' AND date = '20180115'
               
-The OUTPUT query / Description: 	Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".
+The OUTPUT query / Description: 	Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr".
+The second witness, named Annabel, lives somewhere on "Franklin Ave".
 
 --SOLUTION to QUESTION 1: The first witness lives at the last house on "Northwestern Dr--
+_____________________________________________________________________________________________________________________________________________________
 SELECT * 
 FROM person
 WHERE LOWER(address_street_name) LIKE '%northwestern dr%'    
@@ -28,6 +35,8 @@ id	name	license_id	address_number	address_street_name	ssn
 /* QUESTION 2:Write a query that identifies the second witness. */
 NOTE: The second witness, named Annabel, lives somewhere on "Franklin Ave".
 
+SOLUTION to QUESTION 2:
+____________________________________________________________________________________
 SELECT * 
 FROM person
 WHERE LOWER(name) LIKE 'annabel%' 
@@ -50,8 +59,118 @@ OR person_id = 16371 -- 2ND witness
 
 OUTPUT:
 person_id	transcript
-14887	I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. The membership number on the bag started with "48Z". Only gold members have those bags. The man got into a car with a plate that included "H42W".
+14887	I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. The membership number on the bag started with "48Z". Only gold members have those bags. 
+The man got into a car with a plate that included "H42W".
 16371	I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th.
+
+SOLUTION to QUESTION 3:
+____________________________________________________________________________________________________________________________
+SELECT p.name as murderer
+FROM get_fit_now_check_in c
+	JOIN get_fit_now_member m
+		ON c.membership_id = m.id
+	JOIN person p
+		ON p.id = m.person_id
+	JOIN drivers_license dl
+		ON p.license_id = dl.id
+WHERE  m.id LIKE '48Z%' 
+AND m.membership_status = 'gold'
+AND dl.plate_number LIKE '%H42W%'
+AND c.check_in_date LIKE '____0109'
+
+
+OUTPUT 
+murderer
+Jeremy Bowers
+
+Check your solution
+_________________________________________________________________
+INSERT INTO solution VALUES (1, 'Jeremy Bowers');
+        
+        SELECT value FROM solution;
+
+
+value
+CONGRATS!!!, you found the murderer! But wait, there's more... If you think you're up for a challenge, try querying the interview 
+transcript of the murderer to find the real villain behind this crime. If you feel especially confident in your SQL skills, 
+try to complete this final step with no more than 2 queries. Use this same INSERT statement with your new suspect to check your answer.
+
+
+QUESTION 4: Find the real villain behind this crime.
+---------------------------------------------------------------------------------------------------------------
+RETREIVING the interview transcript of the murderer
+
+SELECT p.name as murderer, i.transcript as testimony
+FROM interview i
+	JOIN get_fit_now_check_in c
+		ON i.person_id = p.id
+	JOIN get_fit_now_member m
+		ON c.membership_id = m.id
+	JOIN person p
+		ON p.id = m.person_id
+	JOIN drivers_license dl
+		ON p.license_id = dl.id
+WHERE  m.id LIKE '48Z%' 
+AND m.membership_status = 'gold'
+AND dl.plate_number LIKE '%H42W%'
+AND c.check_in_date LIKE '____0109
+
+OUTPUT
+________________________________________________________________________________________________________________
+
+murderer	testimony
+Jeremy Bowers	I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5" (65") or 5'7" (67"). 
+She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.
+
+
+
+SOLUTION to QUESTION 4:
+_____________________________________________________________________
+
+SELECT p.name as mastermind, count(fb.event_name)as SQLSymphonyConcert_Attd
+FROM facebook_event_checkin fb
+	JOIN person p
+		ON fb.person_id = p.id
+	JOIN drivers_license dl
+		ON p.license_id = dl.id
+WHERE  dl.gender = 'female'
+	AND (dl.height BETWEEN 65 AND 67)
+	AND LOWER(dl.hair_color) = 'red'
+	AND UPPER(fb.event_name) LIKE '%SQL%'
+	AND UPPER(dl.car_make) like '%TESLA%'
+	AND fb.date LIKE '201712__'
+
+Query OUTPUT
+____________________________________________________________________________________
+mastermind	SQLSymphonyConcert_Attd
+Miranda Priestly	3
+
+-- Miranda Priestly is the real villain behind this crime
+
+
+Check your solution
+_________________________________________________________________
+INSERT INTO solution VALUES (1, 'Miranda Priestly');
+        
+        SELECT value FROM solution;
+
+
+value
+Congrats, you found the brains behind the murder! Everyone in SQL City hails you as the greatest SQL detective of all time. Time to break out the champagne! 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
