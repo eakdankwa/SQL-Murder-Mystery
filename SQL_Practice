@@ -1,0 +1,82 @@
+/*  CONTEXT: A crime has taken place and the detective needs your help. The detective gave you the crime scene report, but you somehow lost it. 
+You vaguely remember that the crime was a ​murder​ that occurred sometime on ​Jan.15, 2018​ and that it took place in ​SQL City​. Start by retrieving
+the corresponding crime scene report from the police department’s database. */
+
+/* QUESTION 1: Write a query that identifies the first witness. */
+
+--EXPLANATION: This particular query shows a glimse of the DATE, TYPE of crime & the DESCRIPTION of the crime
+
+SELECT * 
+FROM crime_scene_report
+WHERE LOWER(city) LIKE 'sql%' 
+AND type LIKE 'murder' AND date = '20180115'
+              
+The OUTPUT query / Description: 	Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".
+
+--SOLUTION to QUESTION 1: The first witness lives at the last house on "Northwestern Dr--
+SELECT * 
+FROM person
+WHERE LOWER(address_street_name) LIKE '%northwestern dr%'    
+ORDER BY address_number DESC 
+LIMIT 1;
+
+ANSWER or OUTPUT
+id	name	license_id	address_number	address_street_name	ssn
+14887	Morty Schapiro	118009	4919	Northwestern Dr	111564949
+
+
+/* QUESTION 2:Write a query that identifies the second witness. */
+NOTE: The second witness, named Annabel, lives somewhere on "Franklin Ave".
+
+SELECT * 
+FROM person
+WHERE LOWER(name) LIKE 'annabel%' 
+AND LOWER(address_street_name) LIKE '%franklin%'  
+
+ANSWER or OUTPUT
+id	name	license_id	address_number	address_street_name	ssn
+16371	Annabel Miller	490173	103	Franklin Ave	318771143
+
+
+QUESTION 3: Find the murderer!
+
+PERSONAL Note: To find the murderer you need the transcript from the 2 Witnesses.
+Query for that:
+
+SELECT person_id,  transcript 
+FROM interview 
+WHERE person_id = 14887 -- 1ST witness
+OR person_id = 16371 -- 2ND witness
+
+OUTPUT:
+person_id	transcript
+14887	I heard a gunshot and then saw a man run out. He had a "Get Fit Now Gym" bag. The membership number on the bag started with "48Z". Only gold members have those bags. The man got into a car with a plate that included "H42W".
+16371	I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
